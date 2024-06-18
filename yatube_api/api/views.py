@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions, filters
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.exceptions import ValidationError, NotFound
 
 from .permissions import AuthorOrOnlyRead
 from posts.models import Group, Post, Follow, User
@@ -46,15 +47,22 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class FollowViewSet(viewsets.ModelViewSet):
-    queryset = Follow.objects.all()
     serializer_class = FollowSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['user__username', 'following__username']
-
+    permission_classes = [permissions.IsAuthenticated,]
+    filter_backends = [filters.SearchFilter,]
+    search_fields = ['following__username',
+]
     def get_queryset(self):
-        user = get_object_or_404(User, username=self.request.user.username)
-        return user.user.all()
+        user = self.request.user
+        return Follow.objects.filter(user=user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user = self.request.user
+        following = serializer.validated_data['following']
+        follow, created = Follow.objects.get_or_create(
+            user=user, following=following
+        )
+        serializer.instance = follow
+
+    def retrieve(self, request, *args, **kwargs):
+        raise NotFound

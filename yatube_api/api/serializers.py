@@ -52,28 +52,22 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class FollowSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
-        queryset=User.objects.all(),
-        slug_field='username',
-        default=serializers.CurrentUserDefault()
+        slug_field='username', read_only=True
     )
     following = serializers.SlugRelatedField(
-        queryset=User.objects.all(),
-        slug_field='username'
+        slug_field='username',
+        queryset=User.objects.all()
     )
 
     class Meta:
         model = Follow
         fields = ('user', 'following')
 
-    def validate(self, data):
-        if data['user'] == data['following']:
-            raise serializers.ValidationError(
-                "You can't follow yourself!"
-            )
-        if Follow.objects.filter(
-            user=data['user'], following=data['following']
-        ).exists():
-            raise serializers.ValidationError(
-                "You're already following this user!"
-            )
-        return data
+    def validate(self, attrs):
+        current_user = self.context['request'].user
+        following_user = attrs['following']
+        
+        if following_user == current_user:
+            raise serializers.ValidationError('You cant follow yourself!')
+        
+        return attrs
