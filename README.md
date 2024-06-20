@@ -52,6 +52,156 @@
     ```sh
     python3 manage.py runserver
     ```
+
+### Документация к API
+
+После запуска сервера документация к API доступна по адресу:
+http://127.0.0.1:8000/redoc/
+
+### Примеры запросов и ответов
+
+#### Получение списка постов
+
+**Запрос:**
+```http
+GET http://127.0.0.1:8000/api/v1/posts/
+```
+
+**Ответ:**
+```json
+{
+    "count": 5,
+    "next": "http://127.0.0.1:8000/api/v1/posts/?limit=2&offset=3",
+    "previous": "http://127.0.0.1:8000/api/v1/posts/?limit=2",
+    "results": [
+        {
+            "id": 1,
+            "author": "string",
+            "text": "string",
+            "pub_date": "2024-01-06T10:01:17.379356Z",
+            "image": "string",
+            "group": 0
+        },
+        {
+            "id": 2,
+            "author": "string",
+            "text": "string",
+            "pub_date": "2024-01-06T10:42:39.054978Z",
+            "image": "string",
+            "group": 0
+        }
+    ]
+}
+```
+
+#### Создание нового поста
+
+**Запрос:**
+```http
+POST http://127.0.0.1:8000/api/v1/posts/
+```
+
+**Тело запроса:**
+```json
+{
+    "text": "string",
+    "image": "string",
+    "group": 0
+}
+```
+
+**Ответ:**
+```json
+{
+    "id": 0,
+    "author": "string",
+    "text": "string",
+    "pub_date": "2024-01-24T14:15:22Z",
+    "image": "string",
+    "group": 0
+}
+```
+
+#### Публикация и получение комментариев к постам
+
+**Запрос:**
+```http
+GET http://127.0.0.1:8000/api/v1/posts/1/comments/
+```
+
+**Ответ:**
+```json
+[
+    {
+        "id": 1,
+        "author": "string",
+        "post": 1,
+        "text": "string",
+        "created": "2024-01-06T10:59:31.721673Z"
+    }
+]
+```
+
+**Запрос:**
+```http
+POST http://127.0.0.1:8000/api/v1/posts/1/comments/
+```
+
+**Тело запроса:**
+```json
+{
+    "text": "1st comment"
+}
+```
+
+**Ответ:**
+```json
+{
+    "id": 1,
+    "author": "string",
+    "post": 1,
+    "text": "string",
+    "created": "2024-01-06T10:59:31.721673Z"
+}
+```
+
+#### Подписка на авторов
+
+**Запрос:**
+```http
+GET http://127.0.0.1:8000/api/v1/follow/
+```
+
+**Ответ:**
+```json
+[
+    {
+        "user": "string",
+        "following": "string"
+    }
+]
+```
+
+**Запрос:**
+```http
+POST http://127.0.0.1:8000/api/v1/follow/
+```
+
+**Тело запроса:**
+```json
+{
+    "following": "string"
+}
+```
+
+**Ответ:**
+```json
+{
+    "user": "string",
+    "following": "string"
+}
+```
+
 ### Авторы
 
 **Супонин Кирилл**
